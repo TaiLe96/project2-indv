@@ -1,26 +1,17 @@
-module.exports = function(sequelize, DataTypes){
-    var Event = sequelize.define("Event", {
-        title: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                len: [1]
-            }
-        },
-        description: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        }
+module.exports = function(sequelize, DataTypes) {
+    var Author = sequelize.define("Author", {
+      // Giving the Author model a name of type STRING
+      name: DataTypes.STRING
     });
-
-    Event.associate = models => {
-        // Each Event belongs to A User
-        models.Event.belongsTo(models.User, { as: "host" })
-        // Each Event can have many UserEvent
-        models.Event.hasMany(models.UserEvent, {
-        // This deletes all associate UserEvents when an Event is deleted
-            onDelete: "cascade"
-        })
-    }
-    return Event;
-}
+  
+    Author.associate = function(models) {
+      // Associating Author with Posts
+      // When an Author is deleted, also delete any associated Posts
+      Author.hasMany(models.Post, {
+        onDelete: "cascade"
+      });
+    };
+  
+    return Author;
+  };
+  
