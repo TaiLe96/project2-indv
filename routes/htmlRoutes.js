@@ -1,10 +1,19 @@
 var path = require("path");
 
-module.exports = function(app){
-    app.get("/", (req,res) => {
-        if(req.user){
-            res.redirect("/login");
-        }
-        res.sendfile(path.join(_dirname, "../"))
+// Routes
+module.exports = function (req, res){
+    // Route to login page
+    app.get("/", (req, res) => {
+        res.sendFile(path.join(__dirname, "../public/login.html"))
+    });
+
+    // After login - Route to post page
+    app.get("/post", function (req, res){
+        res.sendFile(path.join(_dirname, "../public/post.html"))
+    })
+
+    // Route to create post
+    app.get("/makePost", function (req, res){
+        res.sendFile(path.join(__dirname, "../public/createPost.html"))
     })
 }
