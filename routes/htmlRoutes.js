@@ -1,4 +1,5 @@
 var path = require("path");
+var isLoggedIn = require("")
 
 // Routes
 module.exports = function (app){
