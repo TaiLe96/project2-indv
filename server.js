@@ -1,36 +1,34 @@
-// *****************************************************************************
-// Server.js - This file is the initial starting point for the Node/Express server.
-//
-// ******************************************************************************
-// *** Dependencies
-// =============================================================
-var express = require("express");
+const express = require("express");
+var cors = require("cors");
+var jwt = require('express-jwt');
+const mongoose = require("mongoose");
+const routes = require("./routes/api");
+const app = express();
+require("dotenv").config();
+const PORT = process.env.PORT || 1000;
 
-// Sets up the Express App
-// =============================================================
-var app = express();
-var PORT = process.env.PORT || 1000;
-
-// Requiring our models for syncing
-var db = require("./models");
-
-// Sets up the Express app to handle data parsing
-app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+app.use(express.urlencoded({extended :true}));
 app.use(express.json());
 
-// Static directory
-app.use(express.static("public"));
+if (process.env.NODE_ENV === "production"){
+  app.use(express.static("public"));
+}
 
-// Routes
-// =============================================================
-require("./routes/htmlRoutes.js")(app);
-require("./routes/authorApiRoutes.js")(app);
-require("./routes/postApiRoutes.js")(app);
+app.use(app.router);
+routes.initialize(app);
+app.use("/api", jwt({secret: process.env.SERVER_SECRET}));
 
-// Syncing our sequelize models and then starting our Express app
-// =============================================================
-db.sequelize.sync({ force: true }).then(function() {
-  app.listen(PORT, function() {
-    console.log("App listening on PORT " + PORT);
-  });
+app.use(function(err, req, res, next){
+  if(err.name === "UnauthorizedError"){
+    res.status(401).send(err);
+  }else {
+    next(err);
+  }
 });
+
+mongoose.connect(process.env.MONGODB_URI || "mongodb:/localhost/reactcms")
+
+app.listen(PORT, function() {
+  console.log("App is listening on PORT "+PORT)
+})
