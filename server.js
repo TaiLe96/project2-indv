@@ -1,34 +1,39 @@
+// Requiring necessary npm packages and node modules
 const express = require("express");
-var cors = require("cors");
-var jwt = require('express-jwt');
-const mongoose = require("mongoose");
-const routes = require("./routes/api");
+const session = require("express-session");
+const path = require("path");
+
+// Requiring passport as we've configured it
+const passport = require("./config/passport");
+
+// Setting up port variable
+var PORT = process.env.PORT || 3000;
+
+// Setting up Express app
 const app = express();
-require("dotenv").config();
-const PORT = process.env.PORT || 1000;
 
-app.use(cors());
-app.use(express.urlencoded({extended :true}));
+// Setting up various middleware for use in data parsing
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static("public"));
 
-if (process.env.NODE_ENV === "production"){
-  app.use(express.static("public"));
-}
+// Use sessions to keep track of our user's login status
+app.use(session({ secret: "all your mixtape are belong to us", resave: true, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.use(app.router);
-routes.initialize(app);
-app.use("/api", jwt({secret: process.env.SERVER_SECRET}));
+// Require the routes files
+// *** NEEDS TO BE UPDATED TO DEXTER'S FILE STRUCTURE
+require("./routes/apiRoutes.js")(app);
+// require("./routes/passport-routes.js")(app);
+// require("./app/routes/html-routes.js")(app);
 
-app.use(function(err, req, res, next){
-  if(err.name === "UnauthorizedError"){
-    res.status(401).send(err);
-  }else {
-    next(err);
-  }
+// Require db models for syncing
+const db = require("./models");
+
+// Syncing our database via Sequelize, then initalizing the app listening
+db.sequelize.sync().then(function() {
+    app.listen(PORT, function() {
+      console.log("==> 🌎  Listening on port %s. Visit http://localhost:%s/ in your browser.", PORT, PORT);
+    });
 });
-
-mongoose.connect(process.env.MONGODB_URI || "mongodb:/localhost/reactcms")
-
-app.listen(PORT, function() {
-  console.log("App is listening on PORT "+PORT)
-})

@@ -1,73 +1,49 @@
-var db = require("../models");
+const db = require("../models");
 
 module.exports = function(app) {
-    //route used for checking user info during login
-    app.put("/api/user", (req, res) => {
-        db.User.findOne({
-            where: req.body
-        })
-        .then(user => {
-            // send user id back to client
-            res.json(user.id);
-        }).catch(err => {
-            // send a false statement for client to handle error
-            res.send(false);
-        })
-    })
 
-    // route used to register a new user
-    app.post("api/user", (req, res) => {
-        // create an item in user wit values taken from req.body
-        db.User.create(req.body)
-        .then(user => {
-            // send back the user id to client
-            res.json(user.id);
-        }).catch(err => {
-            res.send(false);
-        })
-    })
-
-    // route to get info from a specific user
-    app.get("/api/user/:id", (req, res) => {
-        db.User.findOne({
-            where: {
-                id: req.params.id
-            },
-            attribure: ["id", "email", "name"]
-        }).then(user => {
-            res.json(user);
-            console.log(err);
-            res.send(false)
-        })
-    })
-
-    // route to update information for a specific user
-    app.put("api/user/:id", (req, res) => {
-        db.User.update(req.body,{
-            where: {
-                id: req.params.id
-            }
-        }).then(() => {
-            res.send(true)
-        }).catch(err => {
-            console.log(err);
-            res.send(false);
-        })
-    })
-
-    // route to get all events made by user
-    app.get("/api/user/:id/events", (req, res) => {
-        db.User.findAll({
-            where:{
-                hostId: req.params.id
-            }
-        }).then(events => {
-            res.json(events)
-        }).catch(err => {
-            console.log(err);
-            res.send(false);
-        })
-    })
-
+    // USER ROUTES
+    // =========================================================
     
-}
+        // Get all users
+        app.get("/api/users", function(req, res) {
+            console.log(req.body);
+            db.User.findAll({
+                include: [db.Playlist, db.Subscription]
+            })
+            .then(function(dbUser) {
+                res.json(dbUser);
+            });
+        }); 
+    
+        // Get one user by id and their playlists+subscriptions and return JSON
+        app.get("/api/users/:id", function(req, res) {
+            console.log(req.body);
+            db.User.findOne({
+                where: { id: req.params.id },
+                include:[db.Playlist, db.Subscription] 
+            }).then(function(dbUser) {
+                res.json(dbUser);
+            });
+        }); 
+    
+        // Add a user
+        app.post("/api/users", function(req, res) {
+            db.Users.create({ 
+                username: req.body.username,
+                password: req.body.password
+            }).then(function(dbUser) {
+                res.status(200).end();
+            });
+        });
+    
+        // Get user data
+        app.get('/api/user_data', function(req, res) {
+            if (req.user) {
+                // The user is not logged in
+                res.json(req.user);
+            } else {
+                res.json({});
+            }
+        });
+    }
