@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>Passport Authentication</title>
+  <title>Login Page</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/lumen/bootstrap.min.css">
@@ -13,7 +13,6 @@
   <nav class="navbar navbar-default">
     <div class="container-fluid">
       <div class="navbar-header">
-        <h1>Ebay</h1>
       </div>
     </div>
   </nav>
@@ -30,23 +29,13 @@
             <label for="exampleInputPassword1">Password</label>
             <input type="password" class="form-control" id="password-input" placeholder="Password">
           </div>
-          <!-- <div>
-            <label for="selectUserType">User Type</label>
-            <select class="form-control" id="exampleFormControlSelect1">
-            <option>Artist</option>
-            <option>User</option>
-            </select>
-          </div> -->
-          
-          <button type="submit" class="btn btn-default" id="login" href="/post">Login</button>
-          <button type="submit" class="btn btn-default" id="signup" href="/signup">Sign Up</button>
+          <button type="submit" class="btn btn-default" id="login" href="/artists/login">Login as Buyer</button>
+          <button type="submit" class="btn btn-default" id="logins" >Login as Artist</button>
         </form>
         <br />
-        <!-- <button type="submit" class="btn btn-default"><a href="./signupArtist.html"></a>Sign up as artist</button> -->
-        <!-- <button type="submit" class="btn btn-default">Sign up as buyer</button> -->
-        <!-- <p>Or Sign up as artist <a href="./signupArtist.html">here</a></p>
-        <p>Or Sign up as buyer <a href="./signup.html">here</a></p> -->
-        <form class="mybutton" onclick="window.location.href='/signup/as/artist'"></form>
+        <button type="submit" class="btn btn-default">Sign up as buyer</button>
+        <button type="submit" class="btn btn-default"><a href="./signupArtist.html"></a>Sign up as artist</button>
+        
       </div>
     </div>
   </div>
