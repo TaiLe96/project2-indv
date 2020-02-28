@@ -1,39 +1,41 @@
-// Requiring necessary npm packages and node modules
+require("dotenv").config();
+
 const express = require("express");
-const session = require("express-session");
-const path = require("path");
+var cors = require("cors");
+var jwt = require('express-jwt');
+const mongoose = require("mongoose");
 
-// Requiring passport as we've configured it
-const passport = require("./config/passport");
-
-// Setting up port variable
-var PORT = process.env.PORT || 3000;
-
-// Setting up Express app
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Setting up various middleware for use in data parsing
+// Define middleware here
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static("public"));
+// Serve up static assets (usually on heroku)
 
-// Use sessions to keep track of our user's login status
-app.use(session({ secret: "all your mixtape are belong to us", resave: true, saveUninitialized: true }));
-app.use(passport.initialize());
-app.use(passport.session());
+  app.use(express.static(__dirname + "../public"));
+  
+// Add routes, both API and view
 
-// Require the routes files
-// *** NEEDS TO BE UPDATED TO DEXTER'S FILE STRUCTURE
-require("./routes/apiRoutes.js")(app);
-// require("./routes/passport-routes.js")(app);
-// require("./app/routes/html-routes.js")(app);
+require("./routes/htmlRoutes")(app);
+require("./routes/apiRoutes")(app);
 
-// Require db models for syncing
-const db = require("./models");
+app.use('/api', jwt({secret: "Cheese"}));
+// Error handling
+app.use(function(err, req, res, next) {
+  if (err.name === "UnauthorizedError") {
+    // Send the error rather than to show it on the console
+    res.status(401).send(err);
+  } else {
+    next(err);
+  }
+});
 
-// Syncing our database via Sequelize, then initalizing the app listening
-db.sequelize.sync().then(function() {
-    app.listen(PORT, function() {
-      console.log("==> 🌎  Listening on port %s. Visit http://localhost:%s/ in your browser.", PORT, PORT);
-    });
+// Connect to the Mongo DB
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/reactcms");
+
+// Start the API server
+app.listen(PORT, function() {
+  console.log(`🌎  ==> API Server now listening on PORT ${PORT}!`);
 });

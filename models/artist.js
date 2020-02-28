@@ -1,9 +1,9 @@
-//USER MODEL
+//ARTIST MODEL
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require("bcrypt-nodejs");
 
-const UserSchema = new Schema({
+const ArtistSchema = new Schema({
   email: {
     type: String,
     required: true,
@@ -27,38 +27,38 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
-  username: {
+  name: {
     type: String,
     required: true
   }
 });
 
 // Execute before each user.save() call
-UserSchema.pre("save", function(callback) {
-  let user = this;
+ArtistSchema.pre("save", function(callback) {
+  let artist = this;
 
   // Break out if the password hasn't changed
-  if (!user.isModified("password")) return callback();
+  if (!artist.isModified("password")) return callback();
 
   // Password changed so we need to hash it
   bcrypt.genSalt(5, function(err, salt) {
     if (err) return callback(err);
 
-    bcrypt.hash(user.password, salt, null, function(err, hash) {
+    bcrypt.hash(artist.password, salt, null, function(err, hash) {
       if (err) return callback(err);
-      user.password = hash;
+      artist.password = hash;
       callback();
     });
   });
 });
 
-UserSchema.methods.verifyPassword = function(password, cb) {
+ArtistSchema.methods.verifyPassword = function(password, cb) {
   bcrypt.compare(password, this.password, function(err, isMatch) {
     if (err) return cb(err);
     cb(null, isMatch);
   });
 };
 
-const User = mongoose.model("User", UserSchema);
+const Artist = mongoose.model("Artist", ArtistSchema);
 
-module.exports = User;
+module.exports = Artist;
